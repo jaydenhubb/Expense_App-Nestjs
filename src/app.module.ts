@@ -1,16 +1,18 @@
-import { Module } from '@nestjs/common';
+import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 // import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { CustomInterceptor } from './custom.interceptor';
+// import { CustomInterceptor } from './custom.interceptor';
+import { SummaryModule } from './summary/summary.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
-  imports: [],
+  imports: [SummaryModule, ReportsModule],
   controllers: [AppController],
   providers: [
     AppService,
-    { provide: APP_INTERCEPTOR, useClass: CustomInterceptor },
+    { provide: APP_INTERCEPTOR, useClass: ClassSerializerInterceptor },
   ],
 })
 export class AppModule {}
