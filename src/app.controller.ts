@@ -37,10 +37,10 @@ export class AppController {
   }
   @Post()
   addReport(
-    @Body() { amount, source }: CreateReportDto,
+    @Body() body: CreateReportDto,
     @Param('type', new ParseEnumPipe(ReportType)) type: string,
   ): ReportResponseDto {
-    return this.appService.addReport(type, amount, source);
+    return this.appService.addReport(type, body);
   }
   @Put(':id')
   updateReport(
