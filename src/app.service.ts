@@ -1,22 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import { data, ReportType } from 'src/data';
 import { v4 as uuid } from 'uuid';
+import { ReportResponseDto } from './dtos/reort.dto';
+
+interface UpdateReport {
+  amount?: number;
+  source?: string;
+}
 
 @Injectable()
 export class AppService {
-  getReports(type: string) {
-    const reportType =
-      type === 'income' ? ReportType.INCOME : ReportType.EXPENSE;
-    return data.report.filter((report) => report.type === reportType);
-  }
-  getReport(type: string, id: string) {
+  getReports(type: string): ReportResponseDto[] {
     const reportType =
       type === 'income' ? ReportType.INCOME : ReportType.EXPENSE;
     return data.report
       .filter((report) => report.type === reportType)
-      .find((report) => report.id === id);
+      .map((report): ReportResponseDto => new ReportResponseDto(report));
   }
-  addReport(type: string, amount: number, source: string) {
+  getReport(type: string, id: string): ReportResponseDto {
+    const reportType =
+      type === 'income' ? ReportType.INCOME : ReportType.EXPENSE;
+    const report = data.report
+      .filter((report) => report.type === reportType)
+      .find((report) => report.id === id);
+    if (!report) return;
+    return new ReportResponseDto(report);
+  }
+  addReport(type: string, amount: number, source: string): ReportResponseDto {
     const newReport = {
       id: uuid(),
       source,
@@ -26,13 +36,13 @@ export class AppService {
       type: type === 'income' ? ReportType.INCOME : ReportType.EXPENSE,
     };
     data.report.push(newReport);
-    return newReport;
+    return new ReportResponseDto(newReport);
   }
   updateReport(
     type: string,
     id: string,
-    body: { amount: number; source: string },
-  ): object {
+    body: UpdateReport,
+  ): ReportResponseDto {
     const reportType =
       type === 'income' ? ReportType.INCOME : ReportType.EXPENSE;
     const reportToUpdate = data.report
@@ -46,7 +56,7 @@ export class AppService {
       ...data.report[reportIndex],
       ...body,
     };
-    return data.report[reportIndex];
+    return new ReportResponseDto(data.report[reportIndex]);
   }
   deleteReport(id: string): string {
     const reportIndex = data.report.findIndex((report) => report.id === id);
